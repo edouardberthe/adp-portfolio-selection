@@ -1,0 +1,10 @@
+backtest
+entities
+linear/models
+linear/plots.py
+linear/variance.py
+markowitz
+gurobi.log
+*.pyc
+table.py
+test.py
