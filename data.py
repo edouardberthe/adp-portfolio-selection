@@ -52,7 +52,9 @@ VolReturns = DailyVolReturns * np.sqrt(252)
 
 CovReturns = Returns.cov() * 252
 
-A = range(len(Data.columns))
+N = len(Data.columns)
+A = range(N)
+
 
 # For the report
 # figsize = (10, 6.18)
