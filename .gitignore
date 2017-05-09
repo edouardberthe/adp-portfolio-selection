@@ -8,3 +8,4 @@ gurobi.log
 *.pyc
 table.py
 test.py
+env/

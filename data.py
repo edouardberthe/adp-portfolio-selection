@@ -5,7 +5,6 @@ CAC40Tickers = ['{:s}.PA'.format(t) for t in ['AC','ACA','AI','AIR','BN','BNP','
 
 
 def ReLoadYahooData():
-    """"""
     from entities import Security
     print("Loading data")
     Securities = [Security(t) for t in CAC40Tickers]
@@ -22,7 +21,6 @@ def FilterData(Data):
     print("Removing Outliers")
     Data.drop(Data.index[((Data - Data.mean()).abs() > 3 * Data.std()).any(axis=1)], inplace=True)
     Data.to_pickle("pickle/data.pkl")
-    return Data
 
 
 def LoadData():
@@ -55,8 +53,7 @@ CovReturns = Returns.cov() * 252
 N = len(Data.columns)
 A = range(N)
 
-
 # For the report
 # figsize = (10, 6.18)
 
-figsize = (20, 10)
+figsize = (2, 1)
