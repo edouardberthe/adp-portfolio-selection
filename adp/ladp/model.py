@@ -23,14 +23,15 @@ class LADPModel(Model):
         self._h = None
         self._h_plus = None
 
-    def set(self, R, h_plus, u):
+    def set(self, R, h_plus, V):
         self._R = R
         self._h = R * h_plus
+        self._V = V
         for i in range(N):
             self._holdingConstrs[i].RHS = self._h[i+1]
         self._budgetConstr.RHS = self._h[0]
-        self._h_plus = ft(h_plus, R, self._x, self._y)
-        self.setObjective(quicksum(u * self._h_plus), GRB.MAXIMIZE)
+        self._h_plus = ft(self._h, self._x, self._y)
+        self.setObjective(quicksum(V * self._h_plus), GRB.MAXIMIZE)
 
     def solve(self, R, h_plus, u):
         self.set(R, h_plus, u)
@@ -50,4 +51,4 @@ class LADPModel(Model):
 
     @property
     def ΔV(self):
-        return array([self._budgetConstr.Pi] + [cstr.Pi for cstr in self._holdingConstrs]) * self._R
+        return self._V * self._R + array([self._budgetConstr.Pi] + [cstr.Pi for cstr in self._holdingConstrs]) * self._R
