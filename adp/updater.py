@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from itertools import count
 
-from numpy import identity, ones, zeros
+import numpy as np
+from numpy import array, identity, ones, zeros
 
 from adp.cvar import CVaR
 from adp.generator import GaussianGenerator
-from adp.parameters import S, T, alpha, gamma, init, M
+from adp.parameters import S, T, alpha, gamma, init
 from data import N
 
 e = identity(N+1)
@@ -26,9 +27,8 @@ class ValueFunctionUpdater(object):
         self.V = V
         self.m = m
         self.generator = GaussianGenerator()
-        self.h_plus = zeros((S, N+1))
-        self.h_plus[:, 0] = init
-        self.RT = zeros((S, N+1))
+        self.h_plus = array([], dtype=np.int64).reshape(0, N+1)
+        self.RT = array([], dtype=np.int64).reshape(0, N+1)
         self.counter = count()
 
     @abstractmethod
@@ -42,21 +42,24 @@ class LValueFunctionUpdater(ValueFunctionUpdater):
         s = next(self.counter)
         print("Scenario", s)
 
+        # Initialization
         ΔV = zeros((T, N+1))
+        h_plus = zeros(N+1)
+        h_plus[0] = init
 
         print("\tTime 0")
-        self.m.solve(ones(N+1), self.h_plus[s], self.V[0])
-        self.h_plus[s] = self.m.h_plus
+        self.m.solve(ones(N+1), h_plus, self.V[0])
+        h_plus = self.m.h_plus
 
         # 1 <= t <= T - 1
         for t in range(1, T):
-            R = self.generator.generate()
-            self.m.solve(R, self.h_plus[s], self.V[t])
-            self.h_plus[s] = self.m.h_plus
+            self.m.solve(self.generator.generate(), h_plus, self.V[t])
+            h_plus = self.m.h_plus
             ΔV[t-1] = self.m.ΔV
 
         # Last returns (which we store for later scenarios)
-        self.RT[s] = self.generator.generate()
+        self.RT = np.vstack((self.RT, self.generator.generate()))
+        self.h_plus = np.vstack((self.h_plus, h_plus))
 
         # t = T
         print("\tLast time: t =", T)
@@ -72,19 +75,24 @@ class PWLValueFunctionUpdater(ValueFunctionUpdater):
         s = next(self.counter)
         print("Scenario", s)
 
+        # Initialization
+        h_plus = zeros(N + 1)
+        h_plus[0] = init
+
         print("\tTime 0")
-        self.m.solve(ones(N + 1), self.h_plus[s], self.V[0])
-        self.h_plus[s] = self.m.h_plus
+        self.m.solve(ones(N + 1), h_plus, self.V[0])
+        h_plus = self.m.h_plus
 
         # 1 <= t <= T - 1
         for t in range(1, T):
             R = self.generator.generate()
-            self.m.solve(R, self.h_plus[s], self.V[t])
-            self.h_plus[s] = self.m.h_plus
-            self.V[t-1].update(self.m.ΔV, self.m.pi, alpha[s])
+            self.m.solve(R, h_plus, self.V[t])
+            h_plus = self.m.h_plus
+            self.V[t-1].update(self.m.ΔV, self.V[t].pi, alpha[s])
 
         # Last returns (which we store for later scenarios)
-        self.RT[s] = self.generator.generate()
+        self.RT = np.vstack((self.RT, self.generator.generate()))
+        self.h_plus = np.vstack((self.h_plus, h_plus))
 
         # t = T
         print("\tLast time: t =", T)

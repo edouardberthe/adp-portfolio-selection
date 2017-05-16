@@ -1,14 +1,16 @@
-from gurobi import GRB, Model, quicksum
+from abc import ABCMeta, abstractmethod
 
-import numpy as np
-from numpy import array, identity, zeros
+from gurobi import GRB, Model, quicksum
+from numpy import array
 
 from adp.parameters import theta
 from adp.transition import ft
 from data import N
 
 
-class LADPModel(Model):
+class ADPModel(Model):
+
+    __metadata__ = ABCMeta
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,10 +33,14 @@ class LADPModel(Model):
             self._holdingConstrs[i].RHS = self._h[i+1]
         self._budgetConstr.RHS = self._h[0]
         self._h_plus = ft(self._h, self._x, self._y)
-        self.setObjective(quicksum(V * self._h_plus), GRB.MAXIMIZE)
 
-    def solve(self, R, h_plus, u):
-        self.set(R, h_plus, u)
+    @abstractmethod
+    def setADPObjective(self, V):
+        raise NotImplementedError
+
+    def solve(self, R, h_plus, V):
+        self.set(R, h_plus, V)
+        self.setADPObjective(V)
         self.optimize()
 
     @property
@@ -51,4 +57,9 @@ class LADPModel(Model):
 
     @property
     def ΔV(self):
-        return self._V * self._R + array([self._budgetConstr.Pi] + [cstr.Pi for cstr in self._holdingConstrs]) * self._R
+        return self._V(self._R) + array([self._budgetConstr.Pi] + [cstr.Pi for cstr in self._holdingConstrs]) * self._R
+
+
+class LADPModel(ADPModel):
+    def setADPObjective(self, V):
+        super().setObjective(quicksum(V * self._h_plus), GRB.MAXIMIZE)
