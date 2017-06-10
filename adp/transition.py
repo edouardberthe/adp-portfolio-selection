@@ -1,7 +1,7 @@
 import numpy as np
 
 from data import N
-from .parameters import theta
+from parameters import theta
 
 
 def ft(h: np.ndarray, x: np.ndarray, y: np.ndarray) -> np.ndarray:

@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
 
 from gurobi import GRB, Model, quicksum
-from numpy import array
+from numpy import array, identity
 
-from adp.parameters import theta
 from adp.transition import ft
 from data import N
+from parameters import theta
 
 
 class ADPModel(Model):
@@ -27,6 +27,7 @@ class ADPModel(Model):
 
     def set(self, R, h_plus, V):
         self._R = R
+        self._h_plus_pre = h_plus
         self._h = R * h_plus
         self._V = V
         for i in range(N):
@@ -38,10 +39,11 @@ class ADPModel(Model):
     def setADPObjective(self, V):
         raise NotImplementedError
 
-    def solve(self, R, h_plus, V):
+    def solve(self, R, h_plus, V) -> Model:
         self.set(R, h_plus, V)
         self.setADPObjective(V)
         self.optimize()
+        return self
 
     @property
     def x(self):
@@ -56,10 +58,18 @@ class ADPModel(Model):
         return array([v.getValue() for v in self._h_plus])
 
     @property
-    def ΔV(self):
+    def deltaV(self):
         return self._V(self._R) + array([self._budgetConstr.Pi] + [cstr.Pi for cstr in self._holdingConstrs]) * self._R
+
+    def manualΔV(self):
+        e = identity(N+1)
+        V_plus = array([
+            self.solve(self._R, self._h_plus_pre + e[i], self._V).objVal
+            for i in range(N+1)
+            ])
+        return V_plus - self.solve(self._R, self._h_plus_pre, self._V).objVal
 
 
 class LADPModel(ADPModel):
     def setADPObjective(self, V):
-        super().setObjective(quicksum(V * self._h_plus), GRB.MAXIMIZE)
+        self.setObjective(quicksum(V * self._h_plus), GRB.MAXIMIZE)

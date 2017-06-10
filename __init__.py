@@ -1,4 +1,4 @@
 from data import *
 from entities import *
-from linear import *
+from scenarios_based import *
 from markowitz import *

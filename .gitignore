@@ -1,10 +1,10 @@
 backtest
 entities
-linear/models
-linear/plots.py
-linear/variance.py
+scenarios_based/models
+scenarios_based/plots.py
+scenarios_based/variance.py
 markowitz
 gurobi.log
 *.pyc
-table.py
+report/table.py
 test.py

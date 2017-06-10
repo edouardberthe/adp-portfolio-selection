@@ -2,9 +2,9 @@ import numpy as np
 from numpy import zeros
 
 from adp.ladp.inspection import LADPInspectionModel
-from adp.parameters import M, theta
-from adp.value_function import PWLinearValueFunction
+from adp.value_function import PWLValueFunction
 from data import N
+from parameters import M, theta
 
 
 class PWLADPInspectionModel(LADPInspectionModel):
@@ -13,11 +13,11 @@ class PWLADPInspectionModel(LADPInspectionModel):
         super().__init__()
         self.pi = None
 
-    def solve(self, R: np.ndarray, h_plus: np.ndarray, V: PWLinearValueFunction):
+    def solve(self, R: np.ndarray, h_plus: np.ndarray, V: PWLValueFunction):
         self.pi = np.argmin(V.idx(h_plus[1:]), axis=0) - 1
         return super().solve(R, h_plus, V)
 
-    def step(self, h, V: PWLinearValueFunction):
+    def step(self, h, V: PWLValueFunction):
 
         idx = V.idx(h[1:])
         pi = np.argmin(idx, axis=0) - 1

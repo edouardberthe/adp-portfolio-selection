@@ -1,6 +1,6 @@
 import numpy as np
 
-from .parameters import beta, init
+from parameters import beta, init
 
 
 def CVaR(h):

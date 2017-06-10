@@ -1,9 +1,9 @@
+from adp.updater import LValueFunctionUpdater
 from matplotlib import pyplot as plt
 from numpy import random as rd
 
-from adp.animation import ValueFunctionAnimation
 from adp.ladp_ub import LADPUBInspectionModel
-from adp.updater import LValueFunctionUpdater
+from adp.plot.animation import ValueFunctionAnimation
 from adp.value_function import LinearValueFunction
 
 rd.seed(4)

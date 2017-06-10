@@ -2,7 +2,7 @@ from numpy import identity, zeros
 
 from adp.value_function import ValueFunction
 from data import N
-from ..parameters import *
+from parameters import *
 from ..transition import ft
 
 
@@ -12,7 +12,7 @@ class LADPInspectionModel(object):
         self.x = None
         self.y = None
         self.h_plus = None
-        self.ΔV = None
+        self.deltaV = None
 
     def solve(self, R: np.ndarray, h_plus: np.ndarray, V: ValueFunction):
         """
@@ -31,7 +31,7 @@ class LADPInspectionModel(object):
         h = R * h_plus
         self.x, self.y = self.step(h, V)
         self.h_plus = ft(h, self.x, self.y)
-        self.ΔV = V_plus - V(self.h_plus)
+        self.deltaV = V_plus - V(self.h_plus)
         return self
 
     def step(self, h: np.ndarray, u: np.array):

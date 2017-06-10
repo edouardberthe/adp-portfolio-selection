@@ -2,8 +2,8 @@ import numpy as np
 from numpy import zeros
 
 from adp.ladp.inspection import LADPInspectionModel
-from adp.parameters import theta, w0
 from data import N
+from parameters import theta, w0
 
 
 def LADPUB(obj, R: np.ndarray, h_plus: np.ndarray, u: np.array):

@@ -1,8 +1,8 @@
 from numpy import array
 
 from adp.ladp.model import LADPModel
-from adp.parameters import w0
 from data import N
+from parameters import w0
 
 
 class LADPUBModel(LADPModel):
@@ -17,7 +17,7 @@ class LADPUBModel(LADPModel):
             self._UBConstrs[i].RHS = w0 - self._h[i+1]
 
     @property
-    def ΔV(self):
-        ΔV = super().ΔV
-        ΔV[1:] -= array([cstr.Pi for cstr in self._UBConstrs]) * self._R[1:]
-        return ΔV
+    def deltaV(self):
+        deltaV = super().deltaV
+        deltaV[1:] -= array([cstr.Pi for cstr in self._UBConstrs]) * self._R[1:]
+        return deltaV
