@@ -30,6 +30,8 @@ class LinearValueFunction(np.ndarray, ValueFunction):
 
 class PWLFunction:
 
+    __metaclass__ = ABCMeta
+
     def __call__(self, h: float) -> float:
         pi = self.pi(h)
         return self.y()[pi] + (h - self.a[pi]) * self.slopes[pi]
@@ -156,17 +158,25 @@ class PWLFixedFunction(PWLFunction):
                     k += 1
 
 
-class PWLValueFunction(pd.Series, ValueFunction):
+class SeparableValueFunction(ValueFunction):
 
     def __init__(self, value_function_class=PWLDynamicFunction):
-        super().__init__([value_function_class() for _ in range(N)], index=Data.columns)
+        super().__init__()
+        self.value_functions = pd.Series([value_function_class() for _ in range(N)], index=Data.columns)
         self.cash = 1.
 
     def __call__(self, h: np.ndarray) -> np.ndarray:
         return np.array([h[0] * self.cash] + [self[i](x) for (i, x) in enumerate(h[1:])])
 
     def __str__(self):
-        return "PWL Value Function ({:d} {:s})".format(len(self), self[0].__str__())
+        return "Separable Value Function ({:d} {:s})".format(len(self.value_functions),
+                                                             self[0].__str__())
+
+    def __getitem__(self, item):
+        return self.value_functions[item]
+
+    def __iter__(self):
+        return iter(self.value_functions)
 
     def update(self, h, deltaV, alpha):
         # Update the cash slope
@@ -178,7 +188,7 @@ class PWLValueFunction(pd.Series, ValueFunction):
 
 
 if __name__ == '__main__':
-    V = PWLValueFunction()
+    V = SeparableValueFunction()
     plt.ion()
     for s in range(100):
         h = w0 * rd.rand(N+1)

@@ -15,9 +15,26 @@ class GaussianGenerator:
         self.mean = self.LogGross.mean()
         self.cov = self.LogGross.cov()
 
-    def generate(self):
-        LogScenarios = rd.multivariate_normal(self.mean, self.cov)
-        return np.concatenate(((1 + self.r,), np.exp(LogScenarios)))
+    def generate(self, S) -> np.ndarray:
+        LogScenarios = rd.multivariate_normal(self.mean, self.cov, size=S)
+        return np.concatenate(((1+self.r) * np.ones((S, 1)), np.exp(LogScenarios)), axis=1)
+
+
+class StudentTGenerator:
+
+    def __init__(self, r, nu=2, start=None, end=None):
+        self.r = r
+        self.nu = nu
+        self.Gross = (Data.asfreq(freq, method='pad').pct_change()+1)[1:][start:end]
+        self.LogGross = np.log(self.Gross)
+        self.mean = self.LogGross.mean()
+        self.cov = self.LogGross.cov()
+
+    def generate(self, S) -> np.ndarray:
+        gaussian = rd.multivariate_normal(np.zeros(N), self.cov, S)
+        chi2 = rd.chisquare(self.nu, (S, 1))
+        LogScenarios = gaussian / np.sqrt(self.nu / chi2) + np.array(self.mean)
+        return np.concatenate(((1 + self.r) * np.ones((S, 1)), np.exp(LogScenarios)), axis=1)
 
 
 class OGARCHGenerator:

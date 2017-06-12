@@ -1,10 +1,2 @@
-backtest
-entities
-scenarios_based/models
-scenarios_based/plots.py
-scenarios_based/variance.py
-markowitz
 gurobi.log
 *.pyc
-report/table.py
-test.py

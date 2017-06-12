@@ -8,6 +8,7 @@ from parameters import T, figsize
 
 colors = 'bgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykw'
 
+
 class SlopesNumberPlotter(PlotterProcess):
 
     def __init__(self, V):
@@ -50,9 +51,9 @@ class MeanBreaksPlotter(PlotterProcess):
 
 class MeanSlopesPlotter(PlotterProcess):
 
-    def __init__(self, V):
+    def __init__(self, strategy):
         super().__init__()
-        self.V = V
+        self.strategy = strategy
         self.ax = Axes3D(self.fig)
 
     def draw(self):
@@ -60,7 +61,7 @@ class MeanSlopesPlotter(PlotterProcess):
         for n in range(N):
             xs = range(T)
             ys = n * ones(T)
-            zs = [Vt.V[n].slopes.mean() for Vt in self.V]
+            zs = [V[n].slopes.mean() / V.cash for V in self.strategy]
             self.ax.plot(xs, ys, zs=zs, color=self.colors[n])
         self.ax.set_xlabel('Time')
         self.ax.set_ylabel('Asset')

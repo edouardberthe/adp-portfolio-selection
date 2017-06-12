@@ -78,7 +78,7 @@ def gurobiModel(R, hp, V: ValueFunction) -> (np.ndarray, np.ndarray):
 
     # Linear Expressions
     outputCashFlow = (1+theta) * quicksum(xv) - (1-theta) * quicksum(yv)
-    """:type : gurobipy.LinExpr"""
+    """:type: gurobipy.LinExpr"""
 
     # Objective
     m.setObjective(- V.cash * outputCashFlow, GRB.MAXIMIZE)
