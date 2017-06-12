@@ -66,10 +66,9 @@ for (key, (period, start, middle, end, r)) in periods.items():
         perf_single.plot(ax=ax, label='SP', color='green', lw=1)
 
         # Multi Period
-        for (type, type_key) in (('gaussian', 'G'), ('student', 'T')):
+        for (type, type_key, style) in (('gaussian', 'G', '-'), ('student', 'T', '--')):
             for (m, color) in [(3, 'orange'), (5, 'red')]:
                 dir_name = perf_dir_name.format(type, S, k, key, m, gamma*10)
-                os.makedirs(dir_name, exist_ok=True)
                 try:
                     with open(dir_name + "strategy", "rb") as file:
                         strategy = pickle.load(file)
@@ -77,10 +76,10 @@ for (key, (period, start, middle, end, r)) in periods.items():
                     print(e)
                 else:
                     multi_perf = strategy.score(Weekly_Gross_test).sum(axis=1) / init - 1
-                    multi_perf.name = 'PWL ADP {:s} m = {:d}'.format(type_key, m)
+                    multi_perf.name = 'ADP {:s} m = {:d}'.format(type_key, m)
                     """:type: pandas.DataFrame"""
                     print('\tMulti Period, {:s}, m={:d}: {:.1%}'.format(type, m, multi_perf.iloc[-1]))
-                    multi_perf.plot(ax=ax, lw=1, color=color)
+                    multi_perf.plot(ax=ax, lw=1, ls=style, color=color)
 
         ax.set_title('Performance {:s}, $\gamma$ = {:.1f}'.format(period, gamma))
         ax.set_ylabel('Cumulative return')
@@ -91,5 +90,5 @@ for (key, (period, start, middle, end, r)) in periods.items():
         fig_name = fig_file_name.format(key, int(gamma * 10))
         os.makedirs(os.path.dirname(fig_name), exist_ok=True)
         savefig(fig_name)
-        close()
         # show()
+        close()

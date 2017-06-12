@@ -6,9 +6,9 @@ from adp.pwladp.trainer import ADPStrategyTrainer
 from adp.strategy import ADPStrategy
 from adp.value_function import PWLDynamicFunction
 from data import Data
-from parameters import S, freq, gammas, k, periods, perf_dir_name
+from parameters import S, freq, k, perf_dir_name, periods
 
-key = 'UU'
+key = 'DD'
 (period, start, middle, end, r) = periods[key]
 print('Period', period)
 
@@ -17,11 +17,11 @@ Gross_test = (Data.asfreq(freq, method='pad').pct_change() + 1)[1:][middle:end]
 Gross_test.insert(0, 'r', 1 + r)
 # Scenarios Generator
 type = 'student'
-generator = StudentTGenerator(r=r, nu=2, start=start, end=middle)
+generator = StudentTGenerator(r=r, start=start, end=middle)
 
 for m in (5,):
     print('m =', m)
-    for gamma in gammas:
+    for gamma in [0.6]:
         print('\tGamma', gamma)
         results = {}
         strategy = ADPStrategy(value_function_class=PWLDynamicFunction)
