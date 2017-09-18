@@ -4,6 +4,7 @@ import numpy as np
 from numpy import array, ones, zeros
 
 from adp.cvar import generateΔCVaR
+from adp.generator import Generator
 from adp.pwladp.model import gurobiModel
 from data import N
 from parameters import T, alpha, init
@@ -18,7 +19,7 @@ class TrainingMemory:
 
 class ADPStrategyTrainer:
 
-    def __init__(self, gamma, generator):
+    def __init__(self, gamma: float, generator: Generator):
         self.gamma = gamma
         self.generator = generator
 

@@ -7,9 +7,10 @@ from parameters import test_end, test_start, init
 
 class GrossTestPlotter(PlotterProcess):
 
-    def __init__(self, trainer, lengths=(10, 50)):
+    def __init__(self, trainer, strategy, lengths=(10, 50)):
         super().__init__()
         self.trainer = trainer
+        self.strategy = strategy
         self.ax = self.fig.gca()
         self.scenarios = []
         self.test_wealth = []
@@ -18,7 +19,7 @@ class GrossTestPlotter(PlotterProcess):
 
     def draw(self):
         self.scenarios.append(self.trainer.counter)
-        self.test_wealth.append(np.sum(self.trainer.strategy.score(self.gross)) / init)
+        self.test_wealth.append(np.sum(self.strategy.score(self.gross)) / init)
 
         self.ax.clear()
         # We plot the line 1

@@ -18,7 +18,7 @@ plt.ion()
 plotters = [
     # PWLValueFunctionPlotter(i, strategy),
     FinalReturnPlotter(trainer, lengths=(10, 50)),
-    GrossTestPlotter(trainer)
+    GrossTestPlotter(trainer, strategy)
 ]
 
 firstSlopeAx = FirstSlopeAx(strategy)
@@ -26,10 +26,10 @@ firstSlopeAx = FirstSlopeAx(strategy)
 for s in range(S):
     print(s)
     trainer.train(strategy)
-    if s % repeat == 10:
+    if s % repeat == 1:
         for plotter in plotters:
             plotter.draw()
-        plt.pause(0.001)
+        plt.pause(1)
         firstSlopeAx.plot()
 
 plt.ioff()

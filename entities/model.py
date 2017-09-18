@@ -1,6 +1,6 @@
 from time import time
 
-from gurobi import GRB, GurobiError, Model, quicksum
+from gurobipy import GRB, GurobiError, Model, quicksum
 
 from data import A, Data
 from .portfolio import EquallyWeightedPortfolio, Portfolio
@@ -8,7 +8,7 @@ from .portfolio import EquallyWeightedPortfolio, Portfolio
 
 class PortfolioOptimizer(Model):
     """
-    Extend gurobi.Model class. Doing this allows more flexibility and reusability of the class. Furthermore,
+    Extend gurobipy.Model class. Doing this allows more flexibility and reusability of the class. Furthermore,
     inheritance makes all the methods of gurobipy.Model also available here.
     """
 

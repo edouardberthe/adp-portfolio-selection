@@ -1,9 +1,9 @@
+from adp.generator import GaussianGenerator
 from adp.pwladp.trainer import ADPStrategyTrainer
 from adp.strategy import ADPStrategy
 from adp.value_function import PWLDynamicFunction
 from data import Data, Returns
 from markowitz.model import Markowitz
-from parameters import S
 
 # Train
 Returns_train = Returns['2015']
@@ -15,12 +15,10 @@ Returns_test = Data.asfreq('W-FRI', method='pad').pct_change()[1:]['2016']
 strategy = ADPStrategy(value_function_class=PWLDynamicFunction)
 
 # Process trainer
-trainer = ADPStrategyTrainer(strategy)
+trainer = ADPStrategyTrainer(gamma=0.1, generator=GaussianGenerator(r=0.001))
 test_perf = []
 
-for s in range(S):
-    print(s)
-    next(trainer)
+trainer.train(strategy)
 
 adp_return = strategy.score(Returns_test+1)
 

@@ -1,6 +1,6 @@
 from time import time
 
-from gurobi import quicksum
+from gurobipy import quicksum
 
 from data import A
 from entities.model import PortfolioOptimizer

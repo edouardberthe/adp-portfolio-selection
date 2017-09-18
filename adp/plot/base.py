@@ -1,3 +1,5 @@
+from itertools import cycle
+
 from matplotlib import pyplot as plt
 
 from parameters import figsize
@@ -5,7 +7,7 @@ from parameters import figsize
 
 class PlotterProcess:
 
-    colors = 'bgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykwbgrcmykw'
+    colors = cycle('bgrcmykw')
 
     def __init__(self):
         super().__init__()

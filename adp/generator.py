@@ -1,12 +1,21 @@
+from abc import ABCMeta, abstractmethod
+
 import numpy as np
 import numpy.random as rd
-from rpy2.robjects import pandas2ri, r as R
 
 from data import Data, N
 from parameters import freq
 
 
-class GaussianGenerator:
+class Generator:
+    __metadata__ = ABCMeta
+
+    @abstractmethod
+    def generate(self, S: int) -> np.ndarray:
+        raise NotImplementedError
+
+
+class GaussianGenerator(Generator):
 
     def __init__(self, r, start=None, end=None):
         self.r = r
@@ -15,7 +24,7 @@ class GaussianGenerator:
         self.mean = self.LogGross.mean()
         self.cov = self.LogGross.cov()
 
-    def generate(self, S) -> np.ndarray:
+    def generate(self, S: int) -> np.ndarray:
         LogScenarios = rd.multivariate_normal(self.mean, self.cov, size=S)
         return np.concatenate(((1+self.r) * np.ones((S, 1)), np.exp(LogScenarios)), axis=1)
 
@@ -45,7 +54,8 @@ class OGARCHGenerator:
         self.mean = self.LogGross.mean()
         self.cov = self.LogGross.cov()
 
-    def generate(self):
+    def generate(self, S: int) -> np.ndarray:
+        from rpy2.robjects import pandas2ri, r as R
         pandas2ri.activate()
         R.assign('Data', self.Data)
         R.assign('N', N)

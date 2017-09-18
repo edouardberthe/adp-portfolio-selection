@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from gurobi import GRB, Model, quicksum
+from gurobipy import GRB, Model, quicksum
 from numpy import array, identity
 
 from adp.transition import ft

@@ -1,9 +1,8 @@
-from math import gamma as Gamma, pi
-
 import numpy as np
+from math import gamma as Gamma, pi
 from numpy import linalg as la, random as rd
 
-from data import Data, MeanReturns
+from data import Data, Returns
 
 
 def generateGaussianScenarios(NbScenarios=1000, start=None, end=None, seed=None):
@@ -62,7 +61,7 @@ def multivariate_t_pdf(x, mu, sigma, df):
         sigma = scale matrix (dxd numpy array)
         df = degrees of freedom
     """
-    d = len(MeanReturns)
+    d = len(Returns)
     Num = Gamma(1. * (d + df) / 2)
     Denom = Gamma(1. * df / 2) * pow(df * pi, 1. * d / 2) \
             * np.sqrt(la.det(sigma)) \
