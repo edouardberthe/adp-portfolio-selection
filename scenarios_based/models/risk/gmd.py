@@ -7,7 +7,7 @@ from matplotlib.ticker import FuncFormatter
 
 from data import A, figsize
 from scenarios_based.models.model import ScenariosBasedPortfolioModel
-from generator import generateGaussianScenarios
+from generator import generate_gaussian
 
 
 class GMD(ScenariosBasedPortfolioModel):
@@ -102,4 +102,4 @@ class GMD(ScenariosBasedPortfolioModel):
         plt.show()
 
 if __name__ == '__main__':
-    GMD(*generateGaussianScenarios(100)).optimize().plot()
+    GMD(*generate_gaussian(100)).optimize().plot()

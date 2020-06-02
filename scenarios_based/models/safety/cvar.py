@@ -7,7 +7,7 @@ from matplotlib.ticker import FuncFormatter
 
 from data import figsize, A
 from scenarios_based.models.model import ScenariosBasedPortfolioModel
-from generator import generateGaussianScenarios
+from generator import generate_gaussian
 
 
 class CVaR(ScenariosBasedPortfolioModel):
@@ -96,5 +96,5 @@ class CVaR(ScenariosBasedPortfolioModel):
         plt.show()
 
 if __name__ == '__main__':
-    s, p = generateGaussianScenarios(300)
+    s, p = generate_gaussian(300)
     CVaR(s, p, output=True).optimize().plot()

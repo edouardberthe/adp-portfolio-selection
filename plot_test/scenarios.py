@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from scipy.stats import cauchy, gaussian_kde, levy, norm, t
 
 from data import Data, Returns, figsize
-from generator import generateGaussianScenarios, generateStudentTScenarios
+from generator import generate_gaussian, generate_t
 
 
 def test_generation_student(stock1, stock2, nu=4):
@@ -16,13 +16,13 @@ def test_generation_student(stock1, stock2, nu=4):
     plt.hist(r1, normed=True, bins=bins1)
     plt.subplot(322)
     plt.hist(r2, normed=True, bins=bins2)
-    students = generateStudentTScenarios(nu, 100000)[0]
+    students = generate_t(nu, 100000)[0]
     plt.subplot(323)
     plt.hist(students[:, stock1], normed=True, bins=bins1)
     plt.subplot(324)
     plt.hist(students[:, stock2], normed=True, bins=bins2)
     plt.subplot(325)
-    gaussians = generateGaussianScenarios(100000)[0]
+    gaussians = generate_gaussian(100000)[0]
     plt.hist(gaussians[:, stock1], normed=True, bins=bins1)
     plt.subplot(326)
     plt.hist(gaussians[:, stock2], normed=True, bins=bins2)

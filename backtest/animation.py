@@ -1,15 +1,17 @@
 from matplotlib import animation, pyplot as plt
 
-from .backtest import BackTestGroup, BackTestParamPool, BackTest
+from generator import TGenerator
+from backtest.backtest import BackTest
+from backtest.param_pool import BackTestParamPool
+from backtest.group import BackTestGroup
 from entities.model import EWPortfolioModel
 from scenarios_based.models import CVaR, Minimax, SemiMAD
-from scenarios import generateStudentTScenarios
 
 
-def animateBackTest(backtest: BackTest):
+def animate_backtest(backtest: BackTest):
     fig, ax = plt.subplots()
     line, = ax.plot([], [], lw=2, label=backtest.Model.__name__)
-    plt.legend(loc='lower right') # We hope our backtest won't go there!
+    plt.legend(loc='lower right')  # We hope our backtest won't go there!
     plt.title(str(backtest.pool))
     ax.grid()
     xdata = [backtest.index[0]]
@@ -42,7 +44,7 @@ def animateBackTest(backtest: BackTest):
     plt.show()
 
 
-def animateBackTestGroup(group):
+def animate_backtest_group(group):
     fig, ax = plt.subplots()
     lines = [ax.plot([], [], lw=2, label=b.Model.__name__)[0] for b in group]
     plt.legend(loc='lower right')
@@ -79,10 +81,11 @@ def animateBackTestGroup(group):
     ani = animation.FuncAnimation(fig, run, group.generator, blit=False, interval=10, repeat=False, init_func=init)
     plt.show()
 
-if __name__ == '__main__':
-    pool = BackTestParamPool(freq='M', window=365, generator=generateStudentTScenarios, N=1000)
-    #b = BackTest(SemiMAD, pool)
-    #animateBackTest(b)
-    g = BackTestGroup([CVaR, Minimax, SemiMAD, EWPortfolioModel], pool)
-    animateBackTestGroup(g)
 
+if __name__ == '__main__':
+    generator = TGenerator(3)
+    pool = BackTestParamPool(freq='M', window=365, generator=generator, N=1000)
+    # b = BackTest(SemiMAD, pool)
+    # animateBackTest(b)
+    g = BackTestGroup([CVaR, Minimax, SemiMAD, EWPortfolioModel], pool)
+    animate_backtest_group(g)

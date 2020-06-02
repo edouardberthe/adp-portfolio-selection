@@ -4,7 +4,7 @@ from random import randint
 
 from data import A, MeanReturns
 from entities.portfolio import Portfolio
-from generator import generateGaussianScenarios, generateStudentTScenarios
+from generator import generate_gaussian, generate_t
 from markowitz import Markowitz
 from scenarios_based.models import CVaR, GMD, MAD, Minimax, SemiMAD, VaR
 
@@ -74,7 +74,7 @@ class TestCaseWrapper(object):
 
         def setUp(self):
             self.seed = 5
-            self.scenarios, self.probas = generateGaussianScenarios(100, seed=self.seed)
+            self.scenarios, self.probas = generate_gaussian(100, seed=self.seed)
 
         def createModel(self, *args, **kwargs):
             """
@@ -87,7 +87,7 @@ class TestCaseWrapper(object):
             Checks that reconfiguring the model with new scenarios/probas gives the same output as creating a new Model.
             """
             s, p = self.scenarios, self.probas
-            s2, p2 = generateGaussianScenarios(len(p), seed=self.seed + 1 if self.seed is not None else None)
+            s2, p2 = generate_gaussian(len(p), seed=self.seed + 1 if self.seed is not None else None)
 
             self.assertEqual(
                 self.Model(s, p).update().reconfigure(s2, p2).optimize().objval,
@@ -172,7 +172,7 @@ class TestMADAndSemiMAD(unittest.TestCase):
 
     def test_same_output(self):
         """Checks that the MAD and the SemiMAD give the same output portfolio and half of the objective value."""
-        s, p = generateGaussianScenarios()
+        s, p = generate_gaussian()
         m = MAD(s, p).optimize()
         m2 = SemiMAD(s, p).optimize()
 
@@ -184,14 +184,14 @@ class GaussianGeneratorTestCase(TestCaseWrapper.GeneratorBaseTestCase):
 
     @property
     def generator(self):
-        return generateGaussianScenarios
+        return generate_gaussian
 
 
 class StudentGeneratorTestCase(TestCaseWrapper.GeneratorBaseTestCase):
 
     @property
     def generator(self):
-        return generateStudentTScenarios
+        return generate_t
 
 
 class Test(unittest.TestCase):

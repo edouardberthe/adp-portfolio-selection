@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from data import A
 from scenarios_based.models.model import ScenariosBasedPortfolioModel
-from generator import generateGaussianScenarios
+from generator import generate_gaussian
 
 
 class Minimax(ScenariosBasedPortfolioModel):
@@ -68,5 +68,5 @@ class Minimax(ScenariosBasedPortfolioModel):
         plt.show()
 
 if __name__ == '__main__':
-    s, p = generateGaussianScenarios(200)
+    s, p = generate_gaussian(200)
     Minimax(s, p, output=True).optimize().plot()

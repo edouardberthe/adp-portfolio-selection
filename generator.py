@@ -1,79 +1,78 @@
+from abc import ABC, abstractmethod
+from typing import Tuple, Sequence
+
 import numpy as np
-from math import gamma as Gamma, pi
-from numpy import linalg as la, random as rd
+from numpy import random as rd
 
 from data import Data, Returns
 
 
-def generateGaussianScenarios(NbScenarios=1000, start=None, end=None, seed=None):
-    """
-    Generates random scenarios based on a multivariate Gaussian distribution of the log returns.
-        - NbScenarios: int    - Number of scenarios to compute
-        - start/end:   period - Period on which computing the variance-covariance matrix
-        - seed:        int    - Seed for random generation
-    """
-    LocalData = Data[start:end]
-    LogReturns = np.log(LocalData / LocalData.shift())[1:]
-    MeanLogReturns = LogReturns.mean()
-    CovLogReturns = LogReturns.cov()
+class ScenarioGenerator(ABC):
+    def __init__(self, seed: int = None):
+        if seed is not None:
+            rd.seed(seed)
 
-    if seed is not None:
-        rd.seed(seed)
+    @abstractmethod
+    def generate(self, n_scenarios: int, start=None, end=None) -> Tuple[Sequence, Sequence]:
+        raise NotImplementedError()
 
-    LogScenarios = rd.multivariate_normal(MeanLogReturns, CovLogReturns, size=NbScenarios)
-    Scenarios = np.exp(LogScenarios) - 1
-
-    Probas = np.ones(NbScenarios) / NbScenarios
-    return Scenarios, Probas
+    @abstractmethod
+    def __str__(self) -> str:
+        raise NotImplementedError()
 
 
-def generateStudentTScenarios(NbScenarios=1000, nu=3, start=None, end=None, seed=None):
-    """
-    Generates random scenarios based on a multivariate 'student' t distribution of the log returns.
-        - NbScenarios: int    - Number of scenarios to compute
-        - start/end:   period - Period on which to compute the
-                                variance-covariance matrix
-        - seed:        int    - Seed for random generation
-    """
-    LocalData = Data[start:end]
-    LocalReturns = (LocalData / LocalData.shift() - 1)[1:]
-    MeanLocalReturns = LocalReturns.mean()
-    CovLocalReturns = LocalReturns.cov()
+class GaussianGenerator(ScenarioGenerator):
+    def __str__(self) -> str:
+        return "GaussianGenerator"
 
-    if seed is not None:
-        rd.seed(seed)
-
-    gaussian = rd.multivariate_normal(np.zeros(len(Data.columns)), CovLocalReturns, NbScenarios)
-    chi2 = rd.chisquare(nu, (NbScenarios, 1))
-    scenarios = gaussian / np.sqrt(nu / chi2) + np.array(MeanLocalReturns)
-    probas = np.ones(NbScenarios) / NbScenarios
-    return scenarios, probas
+    def generate(self, n_scenarios: int, start=None, end=None) -> Tuple[Sequence, Sequence]:
+        """
+        Generates random scenarios based on a multivariate Gaussian distribution of the log returns.
+            - NbScenarios: int    - Number of scenarios to compute
+            - start/end:   period - Period on which computing the variance-covariance matrix
+            - seed:        int    - Seed for random generation
+        """
+        data = Data[start:end]
+        log_returns = np.log(data / data.shift())[1:]
+        log_scenarios = rd.multivariate_normal(log_returns.mean(), log_returns.cov(), size=n_scenarios)
+        scenarios = np.exp(log_scenarios) - 1
+        probas = np.ones(n_scenarios) / n_scenarios
+        return scenarios, probas
 
 
-def multivariate_t_pdf(x, mu, sigma, df):
-    """
-    Multivariate t-student density:
-    output:
-        the density of the given x element
-    input:
-        x = parameter (d dimensional numpy array or scalar)
-        mu = mean (d dimensional numpy array or scalar)
-        sigma = scale matrix (dxd numpy array)
-        df = degrees of freedom
-    """
-    d = len(Returns)
-    Num = Gamma(1. * (d + df) / 2)
-    Denom = Gamma(1. * df / 2) * pow(df * pi, 1. * d / 2) \
-            * np.sqrt(la.det(sigma)) \
-            * (1 + (1./df) * np.dot(np.dot((x - mu), la.inv(sigma)), (x - mu))) ** ((d+df)/2)
-    d = 1. * Num / Denom 
-    return d
+class TGenerator(ScenarioGenerator):
+
+    def __init__(self, nu: float, seed: float = None):
+        super().__init__(seed)
+        self.nu = nu
+
+    def __str__(self) -> str:
+        return f"TGenerator({self.nu})"
+
+    def generate(self, n_scenarios: int, start=None, end=None) -> Tuple[Sequence, Sequence]:
+        """
+        Generates random scenarios based on a multivariate 'student' t distribution of the log returns.
+            - n_scenarios: int    - Number of scenarios to compute
+            - start/end:   period - Period on which to compute the
+                                    variance-covariance matrix
+            - seed:        int    - Seed for random generation
+        """
+        data = Data[start:end]
+        returns = data.pct_change()[1:]
+
+        gaussian = rd.multivariate_normal(np.zeros(len(Data.columns)), returns.cov(), n_scenarios)
+        chi2 = rd.chisquare(self.nu, (n_scenarios, 1))
+        scenarios = gaussian / np.sqrt(self.nu / chi2) + np.array(returns.mean())
+        probas = np.ones(n_scenarios) / n_scenarios
+        return scenarios, probas
 
 
 def K(h):
     """Triangular Kernel."""
+
     def wrapped(x):
-        return (np.abs(x) < 1./h) * h * (1 - h * np.abs(x))
+        return (np.abs(x) < 1. / h) * h * (1 - h * np.abs(x))
+
     return wrapped
 
 

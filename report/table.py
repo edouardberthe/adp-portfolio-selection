@@ -5,11 +5,11 @@ from tabulate import tabulate
 
 from data import *
 from entities.portfolio import EquallyWeightedPortfolio, PortfolioGroup
-from generator import generateGaussianScenarios, generateStudentTScenarios
+from generator import generate_gaussian, generate_t
 from markowitz import Markowitz
 from scenarios_based.models import CVaR, GMD, MAD, Minimax, ScenariosBasedPortfolioModel, SemiMAD
 
-s, p = generateGaussianScenarios(100)
+s, p = generate_gaussian(100)
 
 
 def TestThree():
@@ -49,7 +49,7 @@ def PlotRollingVolatility():
 
 def TestMADSemiMAD():
     """Checks that MAD and Semi MAD model lead to the same portfolio, and that MAD = 2 * SemiMAD."""
-    s, p = generateGaussianScenarios()
+    s, p = generate_gaussian()
     MADPort = MAD(s, p).optimize().getPortfolio()
     SemiMADPort = SemiMAD(s, p).optimize().getPortfolio()
     PortfolioGroup([MADPort, SemiMADPort]).plot()
@@ -66,7 +66,7 @@ def TableInfluenceIntegerVariables():
     print(params)
     for n in N:
         print("Computing with {:d} scenarios".format(n))
-        s, p = generateGaussianScenarios(n)
+        s, p = generate_gaussian(n)
         row = [n]
         for param in params:
             t = time()
@@ -86,7 +86,7 @@ def TableInfluenceIntegerVariables():
     plt.show()
 
 
-def TableTime(N=5000, latex=False, generator=generateStudentTScenarios, **kwargs):
+def TableTime(N=5000, latex=False, generator=generate_t, **kwargs):
     """
     Computes and plots a Table comparing the different risk measures and safety measures. Important: this is NOT a good
     plot_test, because we suppose holding a portfolio from the beginning of times, but this portfolio is computed from the
