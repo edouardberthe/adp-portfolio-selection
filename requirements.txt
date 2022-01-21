@@ -5,7 +5,7 @@ cycler==0.10.0
 decorator==4.1.2
 gurobipy==7.0.2
 idna==2.6
-ipython==6.2.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 jedi==0.10.2
 matplotlib==2.0.2
