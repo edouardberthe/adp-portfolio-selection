@@ -9,7 +9,7 @@ ipython==6.2.0
 ipython-genutils==0.2.0
 jedi==0.10.2
 matplotlib==2.0.2
-numpy==1.13.1
+numpy==1.21.0
 pandas==0.20.3
 pandas-datareader==0.5.0
 pexpect==4.2.1
